@@ -17,11 +17,23 @@
         <h4><a>{{ campground.name }}</a></h4>
         <p>{{ campground.description }}</p>
         <p>
-          <em
-            >Submitted by: {{ campground.author.username }}, <%=
-            moment(campground.createdAt).fromNow() %></em
-          >
+          <em>Submitted by: {{ campground.author.username }}</em>
         </p>
+        {% if user.is_authenticated and user.pk == campground.author.id %}
+        <a
+          class="btn btn-warning"
+          href="{% url 'campgrounds:edit' id=campground.id %}"
+          >Edit</a
+        >
+        <form
+          action="{% url 'campgrounds:delete' id=campground.id %}"
+          method="POST"
+          class="delete-form"
+        >
+          {% csrf_token %}
+          <button class="btn btn-danger">Delete</button>
+        </form>
+        {% endif %}
       </div>
     </div>
   </div>

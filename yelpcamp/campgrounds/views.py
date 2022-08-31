@@ -1,8 +1,9 @@
 # from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from pymongo import MongoClient
 from django import template
 from bson.objectid import ObjectId
+from django.contrib.auth.models import User
 
 connection_string = "mongodb://localhost/yelpcamp_django"
 client = MongoClient(connection_string)
@@ -54,6 +55,35 @@ def campgrounds_list(request):
 def campground_detail(request, id):
     try:
         campground = locations_collection.find_one({'_id': ObjectId(id)})
+        campground['id'] = campground['_id']
     except NameError:
         raise Http404("Question does not exist")
     return render(request, 'campgrounds/campground_detail.html', {'campground': campground})
+
+
+def campground_edit(request, id):
+    print(request.method)
+    try:
+        campground = locations_collection.find_one({'_id': ObjectId(id)})
+        campground['id'] = campground['_id']
+    except NameError:
+        raise Http404("Question does not exist")
+
+    if request.method == "POST":
+        update_body = {
+            'name': request.POST['name'],
+            'image': request.POST['image'],
+            'description': request.POST['description'],
+            'cost': request.POST['cost'],
+            'location': request.POST['name'],
+        }
+        locations_collection.update_one(
+            {'_id': ObjectId(id)}, {"$set": update_body})
+        return redirect("campgrounds:detail", id=id)
+    return render(request, 'campgrounds/campground_edit.html', {'campground': campground})
+
+
+def campground_delete(request, id):
+    if request.method == 'POST':
+        locations_collection.delete_one({'_id': ObjectId(id)})
+        return redirect('campgrounds:home')
