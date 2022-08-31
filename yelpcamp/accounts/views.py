@@ -2,7 +2,7 @@ import json
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.http import QueryDict
 
 # Create your views here.
@@ -22,8 +22,17 @@ def register_view(request):
 
 
 def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('campgrounds:home')
     return render(request, 'accounts/login.html')
 
 
-def logout(request):
-    return render(request, 'accounts/login.html')
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('campgrounds:home')
