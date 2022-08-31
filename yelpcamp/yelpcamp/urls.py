@@ -17,12 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
-from campgrounds import views as campground_views
 
 urlpatterns = [
     path("", views.landing_page, name="landing"),
     path("admin/", admin.site.urls),
     path("campgrounds/", include('campgrounds.urls')),
+    path("accounts/", include('accounts.urls')),
 ]
 
-urlpatterns += staticfiles_urlpatterns() #serve static files
+urlpatterns += staticfiles_urlpatterns()  # serve static files
